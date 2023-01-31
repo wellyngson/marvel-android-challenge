@@ -3,9 +3,7 @@ package welias.marvel.presentation.ui.fragments.home
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.paging.compose.collectAsLazyPagingItems
 import org.koin.androidx.compose.getViewModel
 import welias.marvel.presentation.model.CharacterUI
 import welias.marvel.presentation.theme.BlackPrimary
@@ -17,8 +15,8 @@ fun HomeFragment(
     openCharactersDetails: (characterUI: CharacterUI) -> Unit = {}
 ) {
     val viewModel = getViewModel<HomeViewModel>()
-    val topCharacters = viewModel.topCharacterUI.collectAsState()
-    val characters = viewModel.getCharacters().collectAsLazyPagingItems()
+    fun getTopCharacters() = viewModel.getTopCharacters()
+    getTopCharacters()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -27,10 +25,8 @@ fun HomeFragment(
         content = {
             HomeContent(
                 modifier = modifier,
-                topCharactersUI = topCharacters,
-                charactersUi = characters,
-                openCharacterDetails = { openCharactersDetails(it) }
-            )
+                viewModel = viewModel
+            ) { openCharactersDetails(it) }
         }
     )
 }

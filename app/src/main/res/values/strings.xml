@@ -2,7 +2,9 @@
     <string name="app_name">Marvel</string>
     <string name="first_characters">Primeiros Personagens</string>
     <string name="all_heroes">Todos os personagens</string>
-    <string name="try_again">Recarregar</string>
+    <string name="try_again">Tentar novamente</string>
+    <string name="error_dialog_title">Ocorreu um erro</string>
+    <string name="error_dialog_default_description">Ocorreu um problema ao buscar os personagens. Por favor, tente novamente.</string>
     <string name="no_connection_error">Ops! Parece que você está sem internet... Verifique sua conexão.</string>
     <string name="lose_connection">Você perdeu a sua conexão!</string>
     <string name="more">Saiba mais</string>

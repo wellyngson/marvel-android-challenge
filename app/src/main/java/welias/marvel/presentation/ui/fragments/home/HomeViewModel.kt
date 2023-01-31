@@ -11,26 +11,28 @@ import welias.marvel.domain.usecase.GetCharactersUseCase
 import welias.marvel.domain.usecase.GetTopCharactersUseCase
 import welias.marvel.presentation.mapper.toCharacterUi
 import welias.marvel.presentation.model.CharacterUI
+import welias.marvel.presentation.state.ViewState
 
 class HomeViewModel(
     private val getTopCharactersUseCase: GetTopCharactersUseCase,
     private val getCharacters: GetCharactersUseCase
 ) : ViewModel() {
 
-    private val _topCharacters = MutableStateFlow(emptyList<CharacterUI>())
-    val topCharacterUI: StateFlow<List<CharacterUI>> get() = _topCharacters
+    private val _topCharacters =
+        MutableStateFlow<ViewState<List<CharacterUI>>>(ViewState.Initial)
+    val topCharacterUI = _topCharacters.asStateFlow()
 
-    init {
+    fun retry() {
         getTopCharacters()
+        getCharacters()
     }
 
-    private fun getTopCharacters() {
+    fun getTopCharacters() {
         viewModelScope.launch {
             getTopCharactersUseCase.execute()
-                .onStart { }
-                .onCompletion { }
+                .onStart { handleLoading() }
                 .map { result -> result.map { it.toCharacterUi() } }
-                .catch { }
+                .catch { handleError(it) }
                 .collect(::handleTopCharacters)
         }
     }
@@ -44,6 +46,14 @@ class HomeViewModel(
     }
 
     private fun handleTopCharacters(topCharacters: List<CharacterUI>) {
-        _topCharacters.value = topCharacters
+        _topCharacters.value = ViewState.Success(topCharacters)
+    }
+
+    private fun handleLoading() {
+        _topCharacters.value = ViewState.Loading
+    }
+
+    private fun handleError(throwable: Throwable) {
+        _topCharacters.value = ViewState.Error(throwable)
     }
 }

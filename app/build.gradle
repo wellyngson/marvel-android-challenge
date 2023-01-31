@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
+    id 'kotlin-parcelize'
 }
 
 android {
@@ -16,6 +17,10 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary true
+        }
+
         buildConfigField "String", "BASE_URL", '"https://gateway.marvel.com:443/"'
         buildConfigField "String", "PUBLIC_KEY", '"1d3a96983457e4cf69602c0cf06a10d5"'
         buildConfigField "String", "PRIVATE_KEY", '"9205a8e45c92322b41042cef560d5a6a60cabd8b"'
@@ -35,7 +40,15 @@ android {
         jvmTarget = '1.8'
     }
     buildFeatures {
-        viewBinding true
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.3.2'
+    }
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
     }
 }
 
@@ -43,16 +56,25 @@ dependencies {
 
     // Default
     implementation "androidx.core:core-ktx:$core_ktx_version"
-    implementation "androidx.appcompat:appcompat:$app_compat_version"
-    implementation "com.google.android.material:material:$material_version"
-    implementation "androidx.constraintlayout:constraintlayout:$constraint_version"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+//    implementation "androidx.lifecycle:lifecycle-runtime-compose:1.0.0"
+    implementation "androidx.activity:activity-compose:$activity_compose_version"
+    implementation "androidx.compose.ui:ui:$compose_ui_version"
+    implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
+    implementation "androidx.compose.material:material:$material_version"
+    implementation 'androidx.ui:ui-layout:0.1.0-dev13'
+    implementation "androidx.constraintlayout:constraintlayout-compose:$constraint_layout_version"
+    implementation "androidx.navigation:navigation-compose:$nav_version"
     testImplementation "androidx.arch.core:core-testing:$core_testing_version"
 
-    //  Activity ViewModel extensions
-    implementation "androidx.activity:activity-ktx:$activity_version"
+    // Paging
+    implementation "androidx.paging:paging-compose:$paging_version"
 
-    // Circle View
-    implementation "de.hdodenhof:circleimageview:$circle_view_version"
+    // Splash screen API
+    implementation "androidx.core:core-splashscreen:$splash_version"
+
+    // Coil
+    implementation "io.coil-kt:coil-compose:2.2.1"
 
     // Coroutines Test
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_test_version"
@@ -67,11 +89,6 @@ dependencies {
     // Faker
     implementation "io.github.serpro69:kotlin-faker:$faker_version"
 
-    // Fragment
-    implementation "androidx.fragment:fragment-ktx:$fragment_version"
-    implementation 'androidx.fragment:fragment:1.6.0-alpha04'
-    debugImplementation 'androidx.fragment:fragment-testing:1.6.0-alpha04'
-
     // Gson
     implementation "com.google.code.gson:gson:$gson_version"
 
@@ -85,14 +102,9 @@ dependencies {
     // Koin
     implementation "io.insert-koin:koin-core:$koin_core_version"
     implementation "io.insert-koin:koin-android:$koin_version"
+    implementation "io.insert-koin:koin-androidx-compose:$koin_version"
     testImplementation "io.insert-koin:koin-test:$koin_test_version"
     testImplementation "io.insert-koin:koin-test-junit4:$koin_test_junit_version"
-
-    // Lifecycle
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
-
-    // Lottie
-    implementation "com.airbnb.android:lottie:$lottie_version"
 
     // Mockk
     testImplementation "io.mockk:mockk:$mockk_version"
@@ -101,13 +113,13 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
 
-    // Picasso
-    implementation "com.squareup.picasso:picasso:$picasso_version"
-
     // Retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
 
     // Truth
     testImplementation "androidx.test.ext:truth:$truth_version"
+
+    debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
 }

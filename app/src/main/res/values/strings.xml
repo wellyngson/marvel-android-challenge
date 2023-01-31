@@ -5,4 +5,10 @@
     <string name="try_again">Recarregar</string>
     <string name="no_connection_error">Ops! Parece que você está sem internet... Verifique sua conexão.</string>
     <string name="lose_connection">Você perdeu a sua conexão!</string>
+    <string name="more">Saiba mais</string>
+
+    <!-- Content Description -->
+    <string name="content_description_back_button">Back button</string>
+    <string name="content_description_image_character">Image character</string>
+    <string name="content_description_image_logo">Image logo</string>
 </resources>

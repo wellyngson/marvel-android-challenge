@@ -2,82 +2,48 @@ package welias.marvel.presentation.ui.fragments.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.map
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import welias.marvel.core.constants.FOUR
-import welias.marvel.core.constants.STEP_OFFSET
-import welias.marvel.core.exception.ErrorException
-import welias.marvel.core.exception.ErrorException.NoConnectionError
-import welias.marvel.core.exception.ErrorException.ServerError
 import welias.marvel.domain.usecase.GetCharactersUseCase
+import welias.marvel.domain.usecase.GetTopCharactersUseCase
 import welias.marvel.presentation.mapper.toCharacterUi
 import welias.marvel.presentation.model.CharacterUI
 
 class HomeViewModel(
-    private val useCase: GetCharactersUseCase
+    private val getTopCharactersUseCase: GetTopCharactersUseCase,
+    private val getCharacters: GetCharactersUseCase
 ) : ViewModel() {
 
-    private val characters = mutableListOf<CharacterUI>()
-    private val _homeState = MutableStateFlow(HomeState())
-    val homeState: StateFlow<HomeState> get() = _homeState
+    private val _topCharacters = MutableStateFlow(emptyList<CharacterUI>())
+    val topCharacterUI: StateFlow<List<CharacterUI>> get() = _topCharacters
 
-    fun getListCharacters() {
+    init {
+        getTopCharacters()
+    }
+
+    private fun getTopCharacters() {
         viewModelScope.launch {
-            val offset = _homeState.value.dataApi.nextOffset
-
-            useCase.execute(offset)
-                .onStart { handleLoading(true) }
-                .onCompletion { handleLoading(false) }
-                .map { characters ->
-                    characters.map { it.toCharacterUi() }
-                }.catch {
-                    it.showConnectionErrorOrThrowable()
-                }.collect(::handleUI)
+            getTopCharactersUseCase.execute()
+                .onStart { }
+                .onCompletion { }
+                .map { result -> result.map { it.toCharacterUi() } }
+                .catch { }
+                .collect(::handleTopCharacters)
         }
     }
 
-    private fun handleLoading(value: Boolean) {
-        _homeState.update { it.copy(isLoading = value) }
-    }
-
-    private fun handleUI(charactersUI: List<CharacterUI>) {
-        val topCharacterUI = mutableListOf<CharacterUI>()
-        val mainCharacterUI = mutableListOf<CharacterUI>()
-
-        sumList(charactersUI).forEachIndexed { index, characterUI ->
-            if (index <= FOUR) topCharacterUI.add(characterUI)
-            else mainCharacterUI.add(characterUI)
-        }
-
-        _homeState.update { state ->
-            state.copy(
-                dataApi = DataApi(nextOffset = state.dataApi.nextOffset.plus(STEP_OFFSET)),
-                characters = mainCharacterUI.toList(),
-                listTopCharacters = topCharacterUI.toList(),
-                error = null,
-                isFirstRequisition = false
-            )
-        }
-    }
-
-    private fun Throwable.showConnectionErrorOrThrowable() {
-        handleError(
-            if (this is NoConnectionError) {
-                NoConnectionError
-            } else {
-                ServerError
+    fun getCharacters(): Flow<PagingData<CharacterUI>> {
+        return flow {
+            getCharacters.execute().collect {
+                emit(it.map { characters -> characters.toCharacterUi() })
             }
-        )
+        }.cachedIn(viewModelScope)
     }
 
-    private fun handleError(error: ErrorException) {
-        _homeState.update {
-            it.copy(error = error)
-        }
-    }
-
-    private fun sumList(charactersUI: List<CharacterUI>): List<CharacterUI> {
-        characters.addAll(charactersUI)
-        return characters.toList()
+    private fun handleTopCharacters(topCharacters: List<CharacterUI>) {
+        _topCharacters.value = topCharacters
     }
 }

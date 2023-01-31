@@ -6,7 +6,7 @@ import org.koin.dsl.module
 import welias.marvel.presentation.ui.fragments.home.HomeViewModel
 
 val viewModelModule = module {
-    viewModel { HomeViewModel(useCase = get()) }
+    viewModel { HomeViewModel(getTopCharactersUseCase = get(), getCharacters = get()) }
 }
 
 object PresentationModule {

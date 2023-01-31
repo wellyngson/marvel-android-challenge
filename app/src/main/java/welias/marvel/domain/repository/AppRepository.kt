@@ -1,8 +1,10 @@
 package welias.marvel.domain.repository
 
+import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
 import welias.marvel.domain.model.CharacterDomain
 
 interface AppRepository {
-    fun getListCharacters(offset: Int): Flow<List<CharacterDomain>>
+    fun getTopListCharacters(): Flow<List<CharacterDomain>>
+    fun getListCharacters(): Flow<PagingData<CharacterDomain>>
 }
